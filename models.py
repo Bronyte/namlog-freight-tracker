@@ -1,19 +1,19 @@
 from db import Database
 
 class User(Database.Model):
-
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = Database.Column(Database.Integer, primary_key=True)
     username = Database.Column(Database.String(80), unique=True, nullable=False)
-    role = Database.Column(Database.String(80), nullable=False)
+    password_hash = Database.Column(Database.String(255), nullable=False)
+    role = Database.Column(Database.String(50), nullable=False)
 
     def to_dict(self):
         return {
-                    "id": self.id,
-                    "username": self.username,
-                    "role": self.role
-                }
+            "id": self.id,
+            "username": self.username,
+            "role": self.role
+        }
 
 
 class Trucks(Database.Model):
