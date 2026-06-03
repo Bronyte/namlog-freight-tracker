@@ -1,12 +1,15 @@
-from flask import Flask
-from db import Database
 
+from flask import Flask
+
+from db import Database
 
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///namlog.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+app.secret_key = "namlog-secret-key"
 
 Database.init_app(app)
 
@@ -16,8 +19,27 @@ from api import api
 
 app.register_blueprint(api)
 
+import os
+
+from seed import seed_database
+
 with app.app_context():
-    Database.create_all()
+    db_path = os.path.join(app.instance_path, "namlog.db")
+
+    if not os.path.exists(db_path):
+        print("namlog.db not found. Creating and seeding database...")
+
+        os.makedirs(app.instance_path, exist_ok=True)
+
+        Database.create_all()
+        seed_database()
+
+        print("Database created and seeded successfully.")
+    else:
+        Database.create_all()
+        print("namlog.db already exists. Seeding skipped.")
+
+
 
 def main():
     app.run(debug=True)
